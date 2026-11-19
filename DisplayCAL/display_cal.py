@@ -15104,11 +15104,11 @@ class MainFrame(ReportFrame, BaseFrame, LUT3DMixin):
                     style = wx.BORDER_SIMPLE
                 else:
                     style = wx.BORDER_THEME
-                grid = CustomGrid(
+                grid = wx.grid.Grid(
                     dlg,
                     -1,
                     size=(
-                        640 * scale + wx.SystemSettings_GetMetric(wx.SYS_VSCROLL_X),
+                        int(640 * scale + wx.SystemSettings_GetMetric(wx.SYS_VSCROLL_X)),
                         -1,
                     ),
                     style=style,

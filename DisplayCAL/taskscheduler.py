@@ -223,7 +223,8 @@ class ExecAction(_Dict2XML):
 
     def __init__(self, cmd: str, args: None | list[str] = None) -> None:
         # Filter any None values
-        args = [arg for arg in args if arg is not None]
+        if args is not None:
+            args = [arg for arg in args if arg is not None]
         _Dict2XML.__init__(
             self,
             command=cmd,
@@ -377,10 +378,7 @@ class Task(_Dict2XML):
             xmlfilename (str): The filename to write the XML to.
         """
         with open(xmlfilename, "wb") as xmlfile:
-            str_self = str(self)
-            if isinstance(str_self, str):
-                str_self = str_self.encode()
-            xmlfile.write(codecs.BOM_UTF16_LE + str_self)
+            xmlfile.write(codecs.BOM_UTF16_LE + str(self).encode("UTF-16-LE"))
 
     def __str__(self) -> str:
         """Convert the task to a string representation in XML format.
@@ -388,13 +386,9 @@ class Task(_Dict2XML):
         Returns:
             str: The string representation of the task in XML format.
         """
-        return (
-            universal_newlines(
-                f'<?xml version="1.0" encoding="UTF-16"?>\n{super().__str__()}'
-            )
-            .replace("\n", "\r\n")
-            .encode("UTF-16-LE")
-        )
+        return universal_newlines(
+            f'<?xml version="1.0" encoding="UTF-16"?>\n{super().__str__()}'
+        ).replace("\n", "\r\n")
 
 
 class TaskScheduler:

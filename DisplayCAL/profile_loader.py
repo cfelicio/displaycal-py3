@@ -5141,6 +5141,24 @@ def main() -> None:
         display_help_message()
     elif "-V" in sys.argv[1:] or "--version" in sys.argv[1:]:
         print(f"{os.path.basename(sys.argv[0])} {VERSION_STRING}")
+    elif "--setup-task" in sys.argv[1:]:
+        if sys.platform == "win32":
+            setup_profile_loader_task(EXE, EXEDIR, PYDIR, force=True)
+        sys.exit(0)
+    elif "--disable-calibration-management" in sys.argv[1:]:
+        if sys.platform == "win32":
+            from DisplayCAL import util_win
+
+            if util_win.calibration_management_isenabled():
+                util_win.disable_calibration_management()
+        sys.exit(0)
+    elif "--enable-calibration-management" in sys.argv[1:]:
+        if sys.platform == "win32":
+            from DisplayCAL import util_win
+
+            if not util_win.calibration_management_isenabled():
+                util_win.enable_calibration_management()
+        sys.exit(0)
     else:
         if sys.platform == "win32":
             setup_profile_loader_task(EXE, EXEDIR, PYDIR)
@@ -5198,7 +5216,15 @@ def filter_unknown_args() -> None | str:
                 "-v",
             )
             and (
-                arg not in ("--oneshot", "--task", "--profile-associations")
+                arg
+                not in (
+                    "--oneshot",
+                    "--task",
+                    "--profile-associations",
+                    "--setup-task",
+                    "--disable-calibration-management",
+                    "--enable-calibration-management",
+                )
                 or sys.platform != "win32"
             )
             and (

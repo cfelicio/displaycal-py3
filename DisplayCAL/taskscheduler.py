@@ -886,7 +886,7 @@ def setup_profile_loader_task(
         print("setup_profile_loader_task end 2")
         return
 
-    if "--task" not in sys.argv[1:] and is_superuser() and (force or not ts.query_task(taskname)):
+    if "--task" not in sys.argv[1:] and (force or is_superuser()) and (force or not ts.query_task(taskname)):
         # Check if our task exists, and if it does not, create it.
         # (requires admin privileges)
         print(f"Trying to create task {taskname}...")
@@ -997,7 +997,19 @@ def setup_profile_loader_task(
                         except OSError as exception:
                             print(exception)
 
-    if sys.getwindowsversion().major < 10:
+    from DisplayCAL.util_win import win_ver
+
+    pname, _, _, build_str = win_ver()
+    is_win10_or_later = "Windows 10" in pname or "Windows 11" in pname
+    if not is_win10_or_later and build_str:
+        try:
+            bnum = int(build_str.split()[1].split(".")[0])
+            if bnum >= 10240:
+                is_win10_or_later = True
+        except Exception:
+            pass
+
+    if not is_win10_or_later:
         print("setup_profile_loader_task end 3")
         return
 

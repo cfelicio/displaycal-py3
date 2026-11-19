@@ -44,3 +44,35 @@ def test_task_write_xml(tmp_path):
     decoded = content.decode("UTF-16")
     assert "<Author>TestAuthor</Author>" in decoded
 
+
+@pytest.mark.skipif(sys.platform != "win32", reason="requires Windows")
+def test_create_task_passes_force_flag_on_replace_existing(monkeypatch):
+    """create_task should pass /F flag when replace_existing=True."""
+    from DisplayCAL.taskscheduler import TaskScheduler
+
+    ts = TaskScheduler()
+    captured_args = []
+
+    def mock_schtasks(args, elevated=False, echo=False):
+        captured_args.extend(args)
+        return True
+
+    monkeypatch.setattr(ts, "_schtasks", mock_schtasks)
+    monkeypatch.setattr(ts, "__contains__", lambda self, name: False)
+
+    ts.create_task("TestTask", replace_existing=True)
+    assert "/F" in captured_args
+
+    captured_args.clear()
+    ts.create_task("TestTask", replace_existing=False)
+    assert "/F" not in captured_args
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="requires Windows")
+def test_setup_profile_loader_task_imports_without_gui():
+    """setup_profile_loader_task must be importable without GUI/wx libraries."""
+    from DisplayCAL.taskscheduler import setup_profile_loader_task
+
+    assert callable(setup_profile_loader_task)
+
+

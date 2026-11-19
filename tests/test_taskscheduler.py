@@ -76,3 +76,15 @@ def test_setup_profile_loader_task_imports_without_gui():
     assert callable(setup_profile_loader_task)
 
 
+@pytest.mark.skipif(sys.platform != "win32", reason="requires Windows")
+def test_profile_loader_setup_task_args_recognized(monkeypatch):
+    """Profile loader CLI arguments for task setup and calibration management should be recognized."""
+    pytest.importorskip("wx")
+    from DisplayCAL.profile_loader import filter_unknown_args
+
+    for flag in ("--setup-task", "--disable-calibration-management", "--enable-calibration-management"):
+        monkeypatch.setattr(sys, "argv", ["DisplayCAL-apply-profiles", flag])
+        assert filter_unknown_args() is None
+
+
+
